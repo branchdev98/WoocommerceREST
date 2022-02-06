@@ -40,21 +40,7 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
-Public Function Utf8BytesToString(abUtf8Array() As Byte) As String
-    Dim nBytes As Long
-    Dim nChars As Long
-    Dim strOut As String
-    Utf8BytesToString = ""
-    ' Catch uninitialized input array
-    nBytes = BytesLength(abUtf8Array)
-    If nBytes <= 0 Then Exit Function
-    ' Get number of characters in output string
-    nChars = MultiByteToWideChar(CP_UTF8, 0&, VarPtr(abUtf8Array(0)), nBytes, 0&, 0&)
-    ' Dimension output buffer to receive string
-    strOut = String(nChars, 0)
-    nChars = MultiByteToWideChar(CP_UTF8, 0&, VarPtr(abUtf8Array(0)), nBytes, StrPtr(strOut), nChars)
-    Utf8BytesToString = Left$(strOut, nChars)
-End Function
+
 Public Function HTMLEntititesDecode(p_strText As String) As String
 Dim strTemp As String
 strTemp = p_strText
@@ -194,36 +180,6 @@ End Function
 
 
 
-Private Sub Command1_Click()
-
-
-
-' To authentication over HTTPS using query params, put the query params in the URL.
-
-Dim success As Long
-
-
-success = http.QuickGetSb("https://shop.provedoriageral.com.br/wp-json/wc/v3/products?consumer_key=ck_d1b69049aab3c4f6f9b2b3723e22b2e066c00349&consumer_secret=cs_4fdbde619f769b35ddccf0c6eb6a538ffe89c992", sbResponseBody)
-If (success = 0) Then
-    Debug.Print http.LastErrorText
-    Exit Sub
-End If
-
-Debug.Print "Response Body:"
-
-Debug.Print sbResponseBody.GetAsString()
-Dim respStatusCode As Long
-respStatusCode = http.LastStatus
-Debug.Print "Response Status Code = " & respStatusCode
-If (respStatusCode >= 400) Then
-    Debug.Print "Response Header:"
-    Debug.Print http.LastHeader
-    Debug.Print "Failed."
-    Exit Sub
-End If
-
-End Sub
-
 
 
 Private Sub Command2_Click()
@@ -252,73 +208,6 @@ Private Sub Command2_Click()
 
 End Sub
 
-Private Sub Command3_Click()
-Dim http As New ChilkatHttp
-Dim success As Long
-
-' Implements the following CURL command:
-
-' curl -X PUT https://shop.provedoriageral.com.br/wp-json/wc/v3/products/61809 \
-'     -u consumer_key:consumer_secret \
-'     -H "Content-Type: application/json" \
-'     -d '{
-'   "regular_price": "24.54"
-' }'
-
-' Use the following online tool to generate HTTP code from a CURL command
-' Convert a cURL Command to HTTP Source Code
-
-http.BasicAuth = 1
-http.login = "ck_d1b69049aab3c4f6f9b2b3723e22b2e066c00349"
-http.password = "cs_4fdbde619f769b35ddccf0c6eb6a538ffe89c992"
-
-' Use this online tool to generate code from sample JSON:
-' Generate Code to Create JSON
-
-' The following JSON is sent in the request body.
-
-' {
-'   "regular_price": "24.54"
-' }
-
-Dim json As New ChilkatJsonObject
-success = json.UpdateString("regular_price", "44.78")
-
-http.SetRequestHeader "Content-Type", "application/json"
-
-Dim sbRequestBody As New ChilkatStringBuilder
-success = json.EmitSb(sbRequestBody)
-
-Dim resp As ChilkatHttpResponse
-Set resp = http.PTextSb("PUT", "https://shop.provedoriageral.com.br/wp-json/wc/v3/products/61809?consumer_key=ck_d1b69049aab3c4f6f9b2b3723e22b2e066c00349&consumer_secret=cs_4fdbde619f769b35ddccf0c6eb6a538ffe89c992", sbRequestBody, "utf-8", "application/json", 0, 0)
-If (http.LastMethodSuccess = 0) Then
-    Debug.Print http.LastErrorText
-    Exit Sub
-End If
-
-Dim sbResponseBody As New ChilkatStringBuilder
-success = resp.GetBodySb(sbResponseBody)
-Dim jResp As New ChilkatJsonObject
-success = jResp.LoadSb(sbResponseBody)
-jResp.EmitCompact = 0
-
-Debug.Print "Response Body:"
-Debug.Print jResp.Emit()
-
-Dim respStatusCode As Long
-respStatusCode = resp.StatusCode
-Debug.Print "Response Status Code = " & respStatusCode
-If (respStatusCode >= 400) Then
-    Debug.Print "Response Header:"
-    Debug.Print resp.Header
-    Debug.Print "Failed."
-
-    Exit Sub
-End If
-
-
-Debug.Print "Example Completed."
-End Sub
 
 Private Sub Command4_Click()
 Set Req = New WinHttp.WinHttpRequest
